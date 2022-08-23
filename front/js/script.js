@@ -1,10 +1,34 @@
+function displayProducts(selector, data) {
+    console.log(data);
+    for(let i=0; i<data.length; i++) {
+        let pimg = [];
+        pimg[i] = document.createElement('img');
+        pimg[i].src = data[i].imageUrl;
+        pimg[i].alt = data[i].altTxt;
+        let ptitle = [];
+        ptitle[i] = document.createElement('h3');
+        ptitle[i].classList.add('productName');
+        ptitle[i].textContent = data[i].name;
+        let pp = [];
+        pp[i] = document.createElement('p');
+        pp[i].classList.add('productDescription');
+        pp[i].textContent = data[i].description;
+        let plink = [];
+        plink[i] = document.createElement('a');
+        plink[i].href = 'product.html?id='+data[i]._id;
+        let particle = [];
+        particle[i] = document.createElement('article');
+        particle[i].innerHTML = pimg[i].outerHTML + ptitle[i].outerHTML + pp[i].outerHTML;
+        plink[i].innerHTML = particle[i].outerHTML;
+        document.getElementById(selector).innerHTML += plink[i].outerHTML;
+    }
+}
+
 function printProducts(selector) {
     fetch('http://localhost:3000/api/products')
     .then((response) => response.json())
     .then((data) => {
-        for (let i=0; i<data.length; i++) {  
-            document.getElementById(selector).innerHTML +='<a href="./product.html?id='+data[i]._id+'">        <article><img src="'+data[i].imageUrl+'" alt="'+data[i].altTxt+'"/><h3 class="productName">'+data[i].name+'</h3><p class="productDescription">'+data[i].description+'</p></article></a>';
-        }    
+    displayProducts(selector, data);    
     })
     .catch(error => alert('Erreur : ' + error));
 }
@@ -77,3 +101,8 @@ function addProductToCart(product, cart) {
     }
     setCart(cart);
  }
+/*
+ function printCart(selector, cart) {
+    
+}
+*/
