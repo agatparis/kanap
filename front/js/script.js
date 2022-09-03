@@ -95,7 +95,10 @@ function productIndex(product, cart) {
 function addProductToCart(product, cart) {
     if(productExist(product, cart)) {
         let position = productIndex(product, cart);
-        cart[position].quantity += Number(product.quantity);
+        if((cart[position].quantity + Number(product.quantity) <= 100)) {
+            cart[position].quantity += Number(product.quantity);
+        }
+        else {cart[position].quantity = 100;}
     }
     else {
         cart.push(product);
@@ -137,7 +140,7 @@ function addProductToCart(product, cart) {
 // afficher les produits
 function printCart(selector, cartProductItems) {
     console.log(cartProductItems);
-    console.log(Object.keys(cartProductItems).length);
+
     
         /*
         let productImg = [];
