@@ -136,12 +136,9 @@ function addProductToCart(product, cart) {
 
 // afficher les produits
 function printCart(selector, cartProductItems) {
-    console.log(cartProductItems);   
-
-    for(let i=0; i<cartProductItems.length; i++) {
-        
-        document.getElementById(selector).innerHTML += 'coucou';
-
+    console.log(cartProductItems);
+    console.log(Object.keys(cartProductItems).length);
+    
         /*
         let productImg = [];
         productImg[i] = document.createElement('img');
@@ -204,7 +201,7 @@ function printCart(selector, cartProductItems) {
     
         document.getElementById(selector).innerHTML += productContentSection[i].outerHTML; 
         */
-    }
+    
 }
 
  function displayCart(selector, cart) {
