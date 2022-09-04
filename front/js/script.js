@@ -1,10 +1,8 @@
 // déclaration de l'objet produit du panier
 class CartProduct {
-    constructor(product, color, quantity = 1) {
-        this.product = product,
-        this.productTotalPrice = this.productPrice * quantity
+    constructor(product) {
+        this.product = product
     }
-
 }
 
 
@@ -111,6 +109,7 @@ function addProductToCart(product, cart) {
     setCart(cart);
  }
 
+
 // fonction de retour du panier avec toutes les données
 
 async function createCart(cart) {
@@ -121,7 +120,6 @@ async function createCart(cart) {
         .then((products) => {
             // création des objets cartProducts
             let cartProducts = [];
-            
             for(let i=0; i<cart.length; i++) {
                 let product = products.find(item => item._id === cart[i].id);
                 if(product) {
@@ -133,15 +131,19 @@ async function createCart(cart) {
                         imageUrl: product.imageUrl,
                         imageAlt: product.altTxt,
                         description: product.description,
-                        price: product.price
+                        price: product.price,
+                        totalProductPrice: Number(product.price) * Number(cart[i].quantity),
                     });
                 }
             }
-        return cartProducts;
+        //return cartProducts;
         });
 }
 
 
+function printCart(cartProductsItems) {
+    console.log(cartProductsItems);
+}
 
     /*
     let cartProductItems = [];
@@ -231,7 +233,7 @@ async function createCart(cart) {
     
 }*/
 
-function displayCart(selector, cart) {
-    createCart(cart);
-      
+async function displayCart(selector, cart) {
+    let cartProductsList = await createCart(cart);
+    printCart(cartProductsList);
 }
