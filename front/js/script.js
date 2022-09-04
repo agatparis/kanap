@@ -1,3 +1,15 @@
+// déclaration de l'objet produit du panier
+class CartProduct {
+    constructor(product, color, quantity = 1) {
+        this.product = product,
+        this.productTotalPrice = this.productPrice * quantity
+    }
+
+}
+
+
+// fonctions d'affichage des produits sous forme de liste pour la homepage
+
 function displayProducts(selector, data) {
     for(let i=0; i<data.length; i++) {
         templateHPList = [];
@@ -20,6 +32,8 @@ function printProducts(selector) {
     })
     .catch(error => alert('Erreur : ' + error));
 }
+
+// fonction d'affichage d'un produit spécifique avec son ID
 
 function printProduct(productId) {
     fetch('http://localhost:3000/api/products')
@@ -54,6 +68,8 @@ function printProduct(productId) {
     .catch(error => alert('Erreur : ' + error));
 }
 
+// fonction de recherche du panier 
+
 function getCart() {
     let cart = localStorage.getItem('cart');
     if(!cart) {
@@ -64,22 +80,26 @@ function getCart() {
     return cart;
 }
 
+// fonction de stockage du panier dans localStorage
+
 function setCart(cart) {
     localStorage.setItem('cart', JSON.stringify(cart));
 }
 
+// fonctions d'ajout des produits au panier
+    // vérification de la présence ou non du produit sélectionné dans le panier
 function productExist(product, cart) {
     return cart.filter(item => {
         return item.name == product.name && item.color == product.color;
     }).length > 0;
 }
-
+    // fonction de récupération de l'index sélectionné du produit dans le panier
 function productIndex(product, cart) {
     return cart.findIndex(item => {
         return item.name == product.name && item.color == product.color;
     });
 }
-
+    // fonction d'ajout du produit sélectionné et de sa quantité dans le panier
 function addProductToCart(product, cart) {
     if(productExist(product, cart)) {
         let position = productIndex(product, cart);
@@ -91,23 +111,39 @@ function addProductToCart(product, cart) {
     setCart(cart);
  }
 
- function returnCart(cart) {
-   
-    class CartProduct {
-        constructor (id, name, color, quantity, imageUrl, altTxt, description, price, totalPrice) {
-        this.id = id;
-        this.name = name;
-        this.color = color;
-        this.quantity = quantity;
-        this.imageUrl = imageUrl;
-        this.altTxt = altTxt;
-        this.description = description;
-        this.price = price;
-        this.totalPrice = totalPrice;
-        }
-    }
+// fonction de retour du panier avec toutes les données
 
-    // récupérer données du panier + données JSON dans un objet 
+async function createCart(cart) {
+    // récupérer données JSON dans l'objet cartProduct
+    
+    fetch('http://localhost:3000/api/products')
+        .then((response) => response.json())
+        .then((products) => {
+            // création des objets cartProducts
+            let cartProducts = [];
+            
+            for(let i=0; i<cart.length; i++) {
+                let product = products.find(item => item._id === cart[i].id);
+                if(product) {
+                    cartProducts[i] = new CartProduct({
+                        id: cart[i].id,
+                        color: cart[i].color,
+                        quantity: cart[i].quantity,
+                        name: product.name,
+                        imageUrl: product.imageUrl,
+                        imageAlt: product.altTxt,
+                        description: product.description,
+                        price: product.price
+                    });
+                }
+            }
+        return cartProducts;
+        });
+}
+
+
+
+    /*
     let cartProductItems = [];
     for(let i=0; i<cart.length; i++) {        
         fetch('http://localhost:3000/api/products')
@@ -116,16 +152,19 @@ function addProductToCart(product, cart) {
         .then((product) => {
         let totalPrice = cart[i].quantity * product.price;
         cartProductItems[i] = new CartProduct(cart[i].id, cart[i].name, cart[i].color, cart[i].quantity, product.imageUrl, product.altTxt, product.description, product.price, totalPrice);
-        });
+        })
+        .catch(error => alert('Erreur : ' + error));
     }        
-    return cartProductItems;
-}
+    return cartProductItems; */
+
 
 
 // afficher les produits
-function printCart(selector, cartProductItems) {
+/*function printCart(selector, cartProductItems) {
     console.log(cartProductItems);
-    console.log(Object.keys(cartProductItems).length);
+    arrayLength = cartProductItems.length;
+    console.log(arrayLength);
+    //console.log(Object.keys(cartProductItems).length);
     
         /*
         let productImg = [];
@@ -188,11 +227,11 @@ function printCart(selector, cartProductItems) {
         productContentSection[i].innerHTML = productImgSection[i].outerHTML + productDescriptionSection[i].outerHTML + productSettingsSection[i].outerHTML;
     
         document.getElementById(selector).innerHTML += productContentSection[i].outerHTML; 
-        */
+        
     
-}
+}*/
 
- function displayCart(selector, cart) {
-    printCart(selector, returnCart(cart));
+function displayCart(selector, cart) {
+    createCart(cart);
       
 }
