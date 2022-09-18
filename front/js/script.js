@@ -60,7 +60,7 @@ function printProduct(productId) {
                 color: document.querySelector('option:checked').value,
                 quantity: Number(document.getElementById('quantity').value)
             }, getCart());
-           location.href = 'cart.html?id=cart';
+           location.href = 'cart.html';
         });
     })
     .catch(error => alert('Erreur : ' + error));
@@ -114,16 +114,16 @@ function addProductToCart(product, cart) {
 
 async function createCart(cart) {
     // récupérer données JSON dans l'objet cartProduct
-    
+    let cartProducts = [];    
     fetch('http://localhost:3000/api/products')
         .then((response) => response.json())
         .then((products) => {
             // création des objets cartProducts
-            let cartProducts = [];
+
             for(let i=0; i<cart.length; i++) {
                 let product = products.find(item => item._id === cart[i].id);
                 if(product) {
-                    cartProducts[i] = new CartProduct({
+                    cartProducts[i] = {
                         id: cart[i].id,
                         color: cart[i].color,
                         quantity: cart[i].quantity,
@@ -133,31 +133,43 @@ async function createCart(cart) {
                         description: product.description,
                         price: product.price,
                         totalProductPrice: Number(product.price) * Number(cart[i].quantity),
-                    });
-                }
-            }
-        //return cartProducts;
+                        };
+                }  
+            }              
         });
+    return cartProducts;    
 }
 
-
-function printCart(cartProductsItems) {
+// fonction d'affichage du panier
+function printCart(selector, cartProductsItems) {
     console.log(cartProductsItems);
+    // boucle de création de l'article
+    let templateCartList = [];
+    for(let i=0; i<cartProductsItems.length; i++) {
+        templateCartList[i] = `<article class="cart__item" data-id=${cartProductsItems[i].id} data-color=${cartProductsItems[i].color}>
+        <div class="cart__item__img">
+        <img src=${cartProductsItems[i].imageUrl} alt=${cartProductsItems[i].imageAlt}>
+        </div>
+        <div class="cart__item__content">
+          <div class="cart__item__content__description">
+            <h2>${cartProductsItems[i].description}</h2>
+            <p>${cartProductsItems[i].color}</p>
+            <p>${cartProductsItems[i].price} €</p>
+          </div>
+          <div class="cart__item__content__settings">
+            <div class="cart__item__content__settings__quantity">
+              <p>Qté : </p>
+              <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value=${cartProductsItems[i].quantity}>
+            </div>
+            <div class="cart__item__content__settings__delete">
+              <p class="deleteItem">Supprimer</p>
+            </div>
+          </div>
+        </div>
+      </article>`;
+      document.getElementById(selector).innerHTML += 'test';
+    }
 }
-
-    /*
-    let cartProductItems = [];
-    for(let i=0; i<cart.length; i++) {        
-        fetch('http://localhost:3000/api/products')
-        .then((response) => response.json())
-        .then((products) => products.find(item => item._id == cart[i].id))
-        .then((product) => {
-        let totalPrice = cart[i].quantity * product.price;
-        cartProductItems[i] = new CartProduct(cart[i].id, cart[i].name, cart[i].color, cart[i].quantity, product.imageUrl, product.altTxt, product.description, product.price, totalPrice);
-        })
-        .catch(error => alert('Erreur : ' + error));
-    }        
-    return cartProductItems; */
 
 
 
@@ -234,6 +246,5 @@ function printCart(cartProductsItems) {
 }*/
 
 async function displayCart(selector, cart) {
-    let cartProductsList = await createCart(cart);
-    printCart(cartProductsList);
+    printCart(selector, await createCart(cart));
 }
