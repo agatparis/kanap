@@ -5,6 +5,19 @@ class CartProduct {
     }
 }
 
+class finalCartProduct {
+    constructor(id, color, quantity, name, imageUrl, imageAlt, description, price, totalProductPrice) {
+        this.id = id,
+        this.color = color,
+        this.quantity = quantity,
+        this.name = name,
+        this.imageUrl = imageUrl,
+        this.imageAlt = imageAlt,
+        this.description = description,
+        this.price = price,
+        this.totalProductPrice = Number(this.price) * Number(this.quantity)
+    }
+}
 
 // fonctions d'affichage des produits sous forme de liste pour la homepage
 
@@ -112,139 +125,52 @@ function addProductToCart(product, cart) {
 
 // fonction de retour du panier avec toutes les données
 
-async function createCart(cart) {
-    // récupérer données JSON dans l'objet cartProduct
-    let cartProducts = [];    
+async function displayCart(selector, cart) {
+    // récupérer données JSON dans l'objet finalProduct
+    let finalProduct = [];    
     fetch('http://localhost:3000/api/products')
         .then((response) => response.json())
         .then((products) => {
-            // création des objets cartProducts
-
+            // création des objets finalProducts
             for(let i=0; i<cart.length; i++) {
                 let product = products.find(item => item._id === cart[i].id);
                 if(product) {
-                    cartProducts[i] = {
-                        id: cart[i].id,
-                        color: cart[i].color,
-                        quantity: cart[i].quantity,
-                        name: product.name,
-                        imageUrl: product.imageUrl,
-                        imageAlt: product.altTxt,
-                        description: product.description,
-                        price: product.price,
-                        totalProductPrice: Number(product.price) * Number(cart[i].quantity),
-                        };
+                   finalProduct[i] = new finalCartProduct(cart[i].id, cart[i].color, cart[i].quantity, product.name, product.imageUrl, product.altTxt, product.description, product.price, Number(product.price) * Number(cart[i].quantity));
                 }  
-            }              
+            }
+
+            // création du template d'affichage des produits du panier
+            var templateCartList = [];
+            for(let i=0; i<finalProduct.length; i++) {
+                templateCartList[i] = `<article class="cart__item" data-id="${finalProduct[i].id}" data-color="${finalProduct[i].color}">
+                <div class="cart__item__img">
+                <img src="${finalProduct[i].imageUrl}" alt="${finalProduct[i].imageAlt}">
+                </div>
+                <div class="cart__item__content">
+                <div class="cart__item__content__description">
+                    <h2>${finalProduct[i].name}</h2>
+                    <p>${finalProduct[i].color}</p>
+                    <p>${finalProduct[i].price} €</p>
+                </div>
+                <div class="cart__item__content__settings">
+                    <div class="cart__item__content__settings__quantity">
+                    <p>Qté : </p>
+                    <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${finalProduct[i].quantity}">
+                    </div>
+                    <div class="cart__item__content__settings__delete">
+                    <p class="deleteItem">Supprimer</p>
+                    </div>
+                </div>
+                </div>
+                </article>`;                
+            document.getElementById(selector).innerHTML += templateCartList[i];    
+        }
+
+        // ajout des fonctions de suppression
+        document.getElementsByClassName('deleteItem').addEventListener('click', function(event) {
+            event.preventDefault();  
         });
-    return cartProducts;    
-}
-
-// fonction d'affichage du panier
-function printCart(selector, cartProductsItems) {
-    console.log(cartProductsItems);
-    // boucle de création de l'article
-    let templateCartList = [];
-    for(let i=0; i<cartProductsItems.length; i++) {
-        templateCartList[i] = `<article class="cart__item" data-id=${cartProductsItems[i].id} data-color=${cartProductsItems[i].color}>
-        <div class="cart__item__img">
-        <img src=${cartProductsItems[i].imageUrl} alt=${cartProductsItems[i].imageAlt}>
-        </div>
-        <div class="cart__item__content">
-          <div class="cart__item__content__description">
-            <h2>${cartProductsItems[i].description}</h2>
-            <p>${cartProductsItems[i].color}</p>
-            <p>${cartProductsItems[i].price} €</p>
-          </div>
-          <div class="cart__item__content__settings">
-            <div class="cart__item__content__settings__quantity">
-              <p>Qté : </p>
-              <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value=${cartProductsItems[i].quantity}>
-            </div>
-            <div class="cart__item__content__settings__delete">
-              <p class="deleteItem">Supprimer</p>
-            </div>
-          </div>
-        </div>
-      </article>`;
-      document.getElementById(selector).innerHTML += 'test';
-    }
-}
 
 
-
-// afficher les produits
-/*function printCart(selector, cartProductItems) {
-    console.log(cartProductItems);
-    arrayLength = cartProductItems.length;
-    console.log(arrayLength);
-    //console.log(Object.keys(cartProductItems).length);
-    
-        /*
-        let productImg = [];
-        productImg[i] = document.createElement('img');
-        productImg[i].src = '../back/images/' + cartProductItems[i].imageUrl;
-        productImg[i].alt = cartProductItems[i].altTxt;
-        let productImgSection = [];
-        productImgSection[i] = document.createElement('div');
-        productImgSection[i].classList.add('cart__item__img');
-        productImgSection[i].innerHTML = productImg[i].outerHTML;
-
-        let productName = [];
-        productName[i] = document.createElement('h2');
-        productName[i].innerText = cartProductItems[i].name;
-        let productColor = [];
-        productColor[i] = document.createElement('p');
-        productColor[i].innerText = cartProductItems[i].color;
-        let productPrice = [];
-        productPrice[i] = document.createElement('p');
-        productPrice[i].innerText = cartProductItems[i].price;
-        let productDescriptionSection = [];
-        productDescriptionSection[i].createElement('div');
-        productDescriptionSection[i].classList.add('cart__item__content__description');
-        productDescriptionSection[i].innerHTML = productName[i].outerHTML + productColor[i].outerHTML + productPrice[i].outerHTML;
-        
-        let productQuantityLabel = [];
-        productQuantityLabel[i] = document.createElement('p');
-        productQuantityLabel[i].innerText = 'Qté : ';
-        let productQuantityInput = [];
-        productQuantityInput[i] = document.createElement('input');
-        productQuantityInput[i].type = 'number';
-        productQuantityInput[i].name = 'itemQunatity';
-        productQuantityInput[i].min = '1';
-        productQuantityInput[i].max = '100';
-        productQuantityInput[i].value = cartProductItems[i].quantity;
-        productQuantityInput[i].classList.add('itemQuantity');
-        let productQuantitySettingsSection = [];
-        productQuantitySettingsSection[i].createElement('div');
-        productQuantitySettingsSection[i].classList.add('cart__item__content__settings__quantity');
-        productQuantitySettingsSection[i].innerHTML = productQuantityLabel.outerHTML + productQuantityInput.outerHTML;
-        
-        let productSuppression = [];
-        productSuppression[i] = document.createElement('p');
-        productSuppression[i].innerText = 'Supprimer';
-        productSuppression[i].classList.add('deleteItem');
-        let productSuppressionSection = [];
-        productSuppressionSection[i].createElement('div');    
-        productSuppressionSection[i].classList.add('cart__item__content__settings__delete');
-            
-        let productSettingsSection = [];
-        productSettingsSection[i] = document.createElement('div');
-        productSettingsSection[i].classList.add('cart__item__content__settings');
-        productSettingsSection[i].innerHTML = productQuantitySettingsSection[i].outerHTML + productSuppressionSection[i].outerHTML;
-
-        let productContentSection = [];
-        productContentSection[i] = document.createElement('article');
-        productContentSection[i].classList.add('cart__item');
-        productContentSection[i].dataset.id = cartProductItems[i].id;
-        productContentSection[i].dataset.color = cartProductItems[i].color;
-        productContentSection[i].innerHTML = productImgSection[i].outerHTML + productDescriptionSection[i].outerHTML + productSettingsSection[i].outerHTML;
-    
-        document.getElementById(selector).innerHTML += productContentSection[i].outerHTML; 
-        
-    
-}*/
-
-async function displayCart(selector, cart) {
-    printCart(selector, await createCart(cart));
+        }); 
 }
