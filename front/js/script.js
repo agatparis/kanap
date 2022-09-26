@@ -130,24 +130,29 @@ function addProductToCart(product, cart) {
     setCart(cart);
  }
 
-// fonction de suppression d'un produit
-function suppressProduct(productId, productColor, productQuantity) {
-    // validation que le produit est dans le panier
-    let productArticles = document.getElementsByTagName('article');
-    Array.from(productArticles).forEach(item => {   
-        if(item.dataset.id == productId && item.dataset.color == productColor) {
-            
-            console.log(productQuantity);
-        }
-        else {
-            console.log('produit absent du panier');
-        }
-    })
-    // si un produit arrive à 0
 
-    // si un produit reste supérieur à 1
+/**
+ * fonction de suppression d'un produit
+ * @param {HTMLElement} element 
+ * @param {Array} cart
+ */
+function deleteProductFromElement(element, cart) {
+    let id = element.dataset.id;
+    let color = element.dataset.color;
+    for(let i=0; i<cart.length; i++) {
+        let product = cart[i];
+        if(product.id == id && product.color == color) {
+            // supprimer le produit du local storage
+            cart.splice(i, 1);
+            setCart(cart);
+        }
+    }
+    location.reload();
 }
 
+// mise à jour qté
+
+// qté totale panier
 
 // fonction de retour du panier avec toutes les données
 
@@ -166,7 +171,7 @@ async function displayCart(selector, cart) {
             }
 
             // création du template d'affichage des produits du panier
-            var templateCartList = [];
+            let templateCartList = [];
             for(let i=0; i<finalProduct.length; i++) {
                 templateCartList[i] = `<article class="cart__item" data-id="${finalProduct[i].id}" data-color="${finalProduct[i].color}">
                 <div class="cart__item__img">
@@ -194,12 +199,8 @@ async function displayCart(selector, cart) {
 
         // ajout des fonctions de suppression
         let suppressionBtn = document.getElementsByClassName('deleteItem');
-        Array.from(suppressionBtn).forEach(item => {            
-            let productId = item.closest('article').dataset.id;
-            let productColor = item.closest('article').dataset.color;            
-            let productQuantity = item.closest('.itemQuantity').value;
-            console.log(productColor + ' ' + productId + productQuantity);
-            item.addEventListener('click', suppressProduct(productId, productColor));
+        Array.from(suppressionBtn).forEach(item => {                       
+            item.addEventListener('click', event => deleteProductFromElement(item.closest('article'), cart));
         });
         })
         .catch(error => alert('Erreur : ' + error)); 
