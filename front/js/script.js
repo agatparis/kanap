@@ -5,7 +5,7 @@ class CartProduct {
     }
 }
 
-class finalCartProduct {
+class FinalCartProduct {
     constructor(id, color, quantity, name, imageUrl, imageAlt, description, price, totalProductPrice) {
         this.id = id,
         this.color = color,
@@ -16,6 +16,16 @@ class finalCartProduct {
         this.description = description,
         this.price = price,
         this.totalProductPrice = Number(this.price) * Number(this.quantity)
+    }
+}
+
+class UserData {
+    constructor(prenom, nom, adresse, ville, email) {
+        this.prenom = prenom,
+        this.nom = nom,
+        this.adresse = adresse, 
+        this.ville = ville,
+        this.email = email
     }
 }
 
@@ -151,7 +161,7 @@ function deleteProductFromElement(element, cart) {
 }
 
 /**
- * 
+ * fonction de modif de la quantité d'un produit
  * @param {HTMLElement} element 
  * @param {Array} cart 
  */
@@ -182,7 +192,7 @@ async function displayCart(selector, cart) {
             for(let i=0; i<cart.length; i++) {
                 let product = products.find(item => item._id === cart[i].id);
                 if(product) {
-                   finalProduct[i] = new finalCartProduct(cart[i].id, cart[i].color, cart[i].quantity, product.name, product.imageUrl, product.altTxt, product.description, product.price, Number(product.price) * Number(cart[i].quantity));
+                   finalProduct[i] = new FinalCartProduct(cart[i].id, cart[i].color, cart[i].quantity, product.name, product.imageUrl, product.altTxt, product.description, product.price, Number(product.price) * Number(cart[i].quantity));
                    totalCartProductQuantity += Number(cart[i].quantity);
                    totalCartPrice += Number(product.price * cart[i].quantity);
                 }  
@@ -234,3 +244,29 @@ async function displayCart(selector, cart) {
         })
         .catch(error => alert('Erreur : ' + error));         
     }
+
+
+
+
+
+    /**
+     * fonction de récupération des données utilisateur, de concatenation avec le panier et d'envoi dans lcoalStorage
+     * 
+     */
+    function userDataCartSaving(cart) {
+        console.log(cart);
+        // récup & validation des données
+        document.getElementById('order').addEventListener('click', event => {
+            let emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+            let email = document.getElementById('email').innerText;
+            if(emailRegex.exec(email)) {
+                alert('Veuillez entrer un email valide');
+            }
+            else {
+                let client = new UserData(document.getElementById('firstName').innerText, document.getElementById('LastName').innerText, document.getElementById('address').innerText, document.getElementById('city').innerText, email);
+                
+            }
+        });
+    }
+    
+    
