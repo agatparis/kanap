@@ -150,6 +150,26 @@ function deleteProductFromElement(element, cart) {
     location.reload();
 }
 
+/**
+ * 
+ * @param {HTMLElement} element 
+ * @param {Array} cart 
+ */
+function changeProductQuantity(element, cart, newQuantity) {
+    let id = element.dataset.id;
+    let color = element.dataset.color;
+    for(let i=0; i<cart.length; i++) {
+        let product = cart[i];
+        if(product.id == id && product.color == color) {
+            // changer la quantité du produit dans le localStorage
+            product.quantity = newQuantity;
+            setCart(cart);
+        }
+    }
+    location.reload();
+}
+
+
 async function displayCart(selector, cart) {
     // récupérer données JSON dans l'objet finalProduct
     let finalProduct = [];  
@@ -204,7 +224,13 @@ async function displayCart(selector, cart) {
         Array.from(suppressionBtn).forEach(item => {                       
             item.addEventListener('click', event => deleteProductFromElement(item.closest('article'), cart));
         });
+
+        // ajout des fonctions de modification de qté
+        let modifQtyBtn = document.getElementsByClassName('itemQuantity');
+        Array.from(modifQtyBtn).forEach(item => {
+            item.addEventListener('change', event => changeProductQuantity(item.closest('article'), cart, event.target.value));
+        }) 
+
         })
-        .catch(error => alert('Erreur : ' + error)); 
-        
+        .catch(error => alert('Erreur : ' + error));         
     }
