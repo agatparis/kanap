@@ -150,15 +150,11 @@ function deleteProductFromElement(element, cart) {
     location.reload();
 }
 
-// mise à jour qté
-
-// qté totale panier
-
-// fonction de retour du panier avec toutes les données
-
 async function displayCart(selector, cart) {
     // récupérer données JSON dans l'objet finalProduct
-    let finalProduct = [];    
+    let finalProduct = [];  
+    let totalCartProductQuantity = 0;
+    let totalCartPrice = 0;  
     fetch('http://localhost:3000/api/products')
         .then((response) => response.json())
         .then((products) => {
@@ -167,6 +163,8 @@ async function displayCart(selector, cart) {
                 let product = products.find(item => item._id === cart[i].id);
                 if(product) {
                    finalProduct[i] = new finalCartProduct(cart[i].id, cart[i].color, cart[i].quantity, product.name, product.imageUrl, product.altTxt, product.description, product.price, Number(product.price) * Number(cart[i].quantity));
+                   totalCartProductQuantity += Number(cart[i].quantity);
+                   totalCartPrice += Number(product.price * cart[i].quantity);
                 }  
             }
 
@@ -181,7 +179,7 @@ async function displayCart(selector, cart) {
                 <div class="cart__item__content__description">
                     <h2>${finalProduct[i].name}</h2>
                     <p>${finalProduct[i].color}</p>
-                    <p>${finalProduct[i].price} €</p>
+                    <p>${finalProduct[i].totalProductPrice} €</p>
                 </div>
                 <div class="cart__item__content__settings">
                     <div class="cart__item__content__settings__quantity">
@@ -197,6 +195,10 @@ async function displayCart(selector, cart) {
             document.getElementById(selector).innerHTML += templateCartList[i];    
         }
 
+        document.getElementById('totalQuantity').innerHTML = totalCartProductQuantity;
+        document.getElementById('totalPrice').innerHTML = totalCartPrice;
+
+
         // ajout des fonctions de suppression
         let suppressionBtn = document.getElementsByClassName('deleteItem');
         Array.from(suppressionBtn).forEach(item => {                       
@@ -204,4 +206,5 @@ async function displayCart(selector, cart) {
         });
         })
         .catch(error => alert('Erreur : ' + error)); 
+        
     }
