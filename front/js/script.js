@@ -1,10 +1,6 @@
-// déclaration de l'objet produit du panier
-class CartProduct {
-    constructor(product) {
-        this.product = product
-    }
-}
-
+/**
+ * déclaration de l'objet produit du panier avec données du panier & du localStorage
+ */
 class FinalCartProduct {
     constructor(id, color, quantity, name, imageUrl, imageAlt, description, price, totalProductPrice) {
         this.id = id,
@@ -19,18 +15,25 @@ class FinalCartProduct {
     }
 }
 
-class UserData {
-    constructor(prenom, nom, adresse, ville, email) {
-        this.prenom = prenom,
-        this.nom = nom,
-        this.adresse = adresse, 
-        this.ville = ville,
+/**
+ * déclaration de l'objet user 
+ */
+class User {
+    constructor(firstName, lastName, address, city, email) {
+        this.firstName = firstName,
+        this.lastName = lastName,
+        this.address = address,
+        this.city = city,
         this.email = email
     }
 }
 
-// fonctions d'affichage des produits sous forme de liste pour la homepage
 
+/**
+ * fonctions d'affichage des produits sous forme de liste pour la homepage
+ * @param {String} selector 
+ * @param {Array} data 
+ */
 async function displayProducts(selector, data) {
     for(let i=0; i<data.length; i++) {
         templateHPList = [];
@@ -54,8 +57,10 @@ async function printProducts(selector) {
     .catch(error => alert('Erreur : ' + error));
 }
 
-// fonction d'affichage d'un produit spécifique avec son ID
-
+/**
+ * fonction d'affichage d'un produit spécifique avec son ID
+ * @param {Int} productId 
+ */
 function printProduct(productId) {
     fetch('http://localhost:3000/api/products')
     .then((response) => response.json())
@@ -97,8 +102,10 @@ function printProduct(productId) {
     .catch(error => alert('Erreur : ' + error));
 }
 
-// fonction de recherche du panier 
-
+/**
+ * fonction de recherche du panier dans le localStorage
+ * @returns
+ */
 function getCart() {
     let cart = localStorage.getItem('cart');
     if(!cart) {
@@ -109,26 +116,44 @@ function getCart() {
     return cart;
 }
 
-// fonction de stockage du panier dans localStorage
-
+/**
+ * fonction de stockage du panier dans localStorage
+ * @param {Array} cart 
+ */
 function setCart(cart) {
     localStorage.setItem('cart', JSON.stringify(cart));
 }
 
-// fonctions d'ajout des produits au panier
-    // vérification de la présence ou non du produit sélectionné dans le panier
+/**
+ * verification de la présence du produit dans le panier
+ * @param {Array} product 
+ * @param {Array} cart 
+ * @returns 
+ */
 function productExist(product, cart) {
     return cart.filter(item => {
         return item.name == product.name && item.color == product.color;
     }).length > 0;
 }
-    // fonction de récupération de l'index sélectionné du produit dans le panier
+
+/**
+ * fonction de récupération de l'index sélectionné du produit dans le panier
+ * @param {Array} product 
+ * @param {Array} cart 
+ * @returns 
+ */
 function productIndex(product, cart) {
     return cart.findIndex(item => {
         return item.name == product.name && item.color == product.color;
     });
 }
-    // fonction d'ajout du produit sélectionné et de sa quantité dans le panier
+
+/**
+ * fonction d'ajout du produit sélectionné et de sa quantité dans le panier
+ * @param {Array} product
+ * @param {Array} cart
+ */
+ 
 function addProductToCart(product, cart) {
     if(productExist(product, cart)) {
         let position = productIndex(product, cart);
@@ -150,7 +175,7 @@ function deleteProductFromElement(element, cart) {
     let id = element.dataset.id;
     let color = element.dataset.color;
     for(let i=0; i<cart.length; i++) {
-        let product = cart[i];
+        let product = cart[i];        
         if(product.id == id && product.color == color) {
             // supprimer le produit du local storage
             cart.splice(i, 1);
@@ -179,6 +204,11 @@ function changeProductQuantity(element, cart, newQuantity) {
     location.reload();
 }
 
+/**
+ * 
+ * @param {String} selector 
+ * @param {Array} cart 
+ */
 
 async function displayCart(selector, cart) {
     // récupérer données JSON dans l'objet finalProduct
@@ -245,28 +275,15 @@ async function displayCart(selector, cart) {
         .catch(error => alert('Erreur : ' + error));         
     }
 
-
-
-
-
-    /**
-     * fonction de récupération des données utilisateur, de concatenation avec le panier et d'envoi dans lcoalStorage
-     * 
-     */
-    function userDataCartSaving(cart) {
-        console.log(cart);
-        // récup & validation des données
-        document.getElementById('order').addEventListener('click', event => {
-            let emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
-            let email = document.getElementById('email').innerText;
-            if(emailRegex.exec(email)) {
-                alert('Veuillez entrer un email valide');
-            }
-            else {
-                let client = new UserData(document.getElementById('firstName').innerText, document.getElementById('LastName').innerText, document.getElementById('address').innerText, document.getElementById('city').innerText, email);
-                
-            }
-        });
-    }
-    
-    
+/**
+ * fonction d'ajout des données utilisateur dans le localStorage
+ * 
+ */
+ 
+ function addUserToStorage() {
+    let url = new URL(window.location.href);
+    let userData = new User(url.searchParams.get('firstName'),url.searchParams.get('lastName'), url.searchParams.get('address'), url.searchParams.get('city'), url.searchParams.get('email'));
+    localStorage.setItem('user', JSON.stringify(userData));
+    console.log(localStorage);
+    location.href = 'confirmation.html';
+ }
