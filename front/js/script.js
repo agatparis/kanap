@@ -107,7 +107,7 @@ function printProduct(productId) {
  * @returns
  */
 function getCart() {
-    let cart = localStorage.getItem('cart');
+    let cart = localStorage.getItem('products');
     if(!cart) {
         cart = [];
     } else {
@@ -121,7 +121,7 @@ function getCart() {
  * @param {Array} cart 
  */
 function setCart(cart) {
-    localStorage.setItem('cart', JSON.stringify(cart));
+    localStorage.setItem('products', JSON.stringify(cart));
 }
 
 /**
@@ -281,9 +281,17 @@ async function displayCart(selector, cart) {
  */
  
  function addUserToStorage() {
-    let url = new URL(window.location.href);
-    let userData = new User(url.searchParams.get('firstName'),url.searchParams.get('lastName'), url.searchParams.get('address'), url.searchParams.get('city'), url.searchParams.get('email'));
-    localStorage.setItem('user', JSON.stringify(userData));
-    console.log(localStorage);
-    location.href = 'confirmation.html';
+    // verif des données saisies
+    document.getElementById('order').addEventListener('click', event => {
+        let url = new URL(window.location.href);
+        let firstName = url.searchParams.get('firstName');
+        let lastName = url.searchParams.get('lastName');
+        let address = url.searchParams.get('address');
+        let city = url.searchParams.get('city');
+        let email = url.searchParams.get('email');
+        let userData = new User(firstName, lastName, address, city, email);
+        localStorage.setItem('contact', JSON.stringify(userData));
+        location.href = 'confirmation.html';
+    });
  }
+
