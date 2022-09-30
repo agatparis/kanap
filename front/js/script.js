@@ -308,11 +308,8 @@ function getUser() {
 
  /**
   * fonction d'envoi des données
-  * 
-  
-
-
- function sendCartData() {
+  */
+function sendCartData() {
     var request = new XMLHttpRequest();
     request.onreadystatechange = () => {
         if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
@@ -325,4 +322,4 @@ function getUser() {
             console.log(this.responseText.postData.text);
         }
     }
- }*/
+ }
