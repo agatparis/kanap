@@ -107,7 +107,7 @@ function printProduct(productId) {
  * @returns
  */
 function getCart() {
-    let cart = localStorage.getItem('products');
+    let cart = localStorage.getItem('produits');
     if(!cart) {
         cart = [];
     } else {
@@ -121,7 +121,7 @@ function getCart() {
  * @param {Array} cart 
  */
 function setCart(cart) {
-    localStorage.setItem('products', JSON.stringify(cart));
+    localStorage.setItem('produits', JSON.stringify(cart));
 }
 
 /**
@@ -256,7 +256,8 @@ async function displayCart(selector, cart) {
         }
 
         document.getElementById('totalQuantity').innerHTML = totalCartProductQuantity;
-        document.getElementById('totalPrice').innerHTML = totalCartPrice;
+        document.getElementById('totalPrice').innerHTML = totalCartPrice;        
+        document.getElementById('order').addEventListener('click', addUserToStorage);
 
 
         // ajout des fonctions de suppression
@@ -280,18 +281,48 @@ async function displayCart(selector, cart) {
  * 
  */
  
- function addUserToStorage() {
+ async function addUserToStorage() {
     // verif des données saisies
-    document.getElementById('order').addEventListener('click', event => {
-        let url = new URL(window.location.href);
-        let firstName = url.searchParams.get('firstName');
-        let lastName = url.searchParams.get('lastName');
-        let address = url.searchParams.get('address');
-        let city = url.searchParams.get('city');
-        let email = url.searchParams.get('email');
-        let userData = new User(firstName, lastName, address, city, email);
-        localStorage.setItem('contact', JSON.stringify(userData));
-        location.href = 'confirmation.html';
-    });
+    let url = new URL(window.location.href);
+    let firstName = url.searchParams.get('firstName');
+    let lastName = url.searchParams.get('lastName');
+    let address = url.searchParams.get('address');
+    let city = url.searchParams.get('city');
+    let email = url.searchParams.get('email');
+    let userData = new User(firstName, lastName, address, city, email);
+    localStorage.setItem('contact', JSON.stringify(userData));        
  }
 
+ /**
+  * fonction de retour de l'utilisateur
+  */
+function getUser() {
+    let user = localStorage.getItem('contact');
+    if(!user) {
+        user = [];
+    } else {
+        user = JSON.parse(user);
+    }
+    return user;
+}
+
+ /**
+  * fonction d'envoi des données
+  * 
+  
+
+
+ function sendCartData() {
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = () => {
+        if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+            request.open('POST', 'http://localhost:3000/api/order', false);
+            request.setRequestHeader('Content-Type', 'application/json');
+            request.send(JSON.stringify(getCart()));
+            request.send(JSON.stringify(getUser()));            
+            this.responseText.postData.text = JSON.stringify(getCart());
+            this.responseText.postData.text = JSON.stringify(getUser());
+            console.log(this.responseText.postData.text);
+        }
+    }
+ }*/
