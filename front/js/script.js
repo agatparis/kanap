@@ -171,7 +171,7 @@ function addProductToCart(product, cart) {
  * @param {HTMLElement} element 
  * @param {Array} cart
  */
-function deleteProductFromElement(element, cart) {
+async function deleteProductFromElement(element, cart) {
     let id = element.dataset.id;
     let color = element.dataset.color;
     for(let i=0; i<cart.length; i++) {
@@ -179,10 +179,10 @@ function deleteProductFromElement(element, cart) {
         if(product.id == id && product.color == color) {
             // supprimer le produit du local storage
             cart.splice(i, 1);
-            setCart(cart);
+            setCart(cart);            
+            location.reload();
         }
     }
-    location.reload();
 }
 
 /**
@@ -190,7 +190,7 @@ function deleteProductFromElement(element, cart) {
  * @param {HTMLElement} element 
  * @param {Array} cart 
  */
-function changeProductQuantity(element, cart, newQuantity) {
+async function changeProductQuantity(element, cart, newQuantity) {
     let id = element.dataset.id;
     let color = element.dataset.color;
     for(let i=0; i<cart.length; i++) {
@@ -198,10 +198,10 @@ function changeProductQuantity(element, cart, newQuantity) {
         if(product.id == id && product.color == color) {
             // changer la quantité du produit dans le localStorage
             product.quantity = newQuantity;
-            setCart(cart);
+            setCart(cart);            
+            location.reload();
         }
     }
-    location.reload();
 }
 
 /**
@@ -210,11 +210,12 @@ function changeProductQuantity(element, cart, newQuantity) {
  * @param {Array} cart 
  */
 
-async function displayCart(selector, cart) {
+function displayCart(selector, cart) {
     // récupérer données JSON dans l'objet finalProduct
     let finalProduct = [];  
     let totalCartProductQuantity = 0;
-    let totalCartPrice = 0;  
+    let totalCartPrice = 0;
+    let productsId = [];  
     fetch('http://localhost:3000/api/products')
         .then((response) => response.json())
         .then((products) => {
@@ -252,13 +253,32 @@ async function displayCart(selector, cart) {
                 </div>
                 </div>
                 </article>`;                
-            document.getElementById(selector).innerHTML += templateCartList[i];    
+            document.getElementById(selector).innerHTML += templateCartList[i];  
+            productsId[i] = finalProduct[i].id;
         }
-
+    
         document.getElementById('totalQuantity').innerHTML = totalCartProductQuantity;
         document.getElementById('totalPrice').innerHTML = totalCartPrice;        
-        document.getElementById('order').addEventListener('click', addUserToStorage);
-
+        document.getElementById('order').closest('form').addEventListener('submit', event => {
+            event.preventDefault();            
+            let body = {
+                'contact': {
+                    'firstName': event.target.querySelector('input[name="firstName"]').value,
+                    'lastName': event.target.querySelector('input[name="lastName"]').value,
+                    'address': event.target.querySelector('input[name="address"]').value,
+                    'city': event.target.querySelector('input[name="city"]').value,
+                    'email': event.target.querySelector('input[name="email"]').value,
+                },
+                'products': productsId                         
+            };
+            fetch('http://localhost:3000/api/order', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify({body})
+            });
+        });
 
         // ajout des fonctions de suppression
         let suppressionBtn = document.getElementsByClassName('deleteItem');
@@ -270,56 +290,8 @@ async function displayCart(selector, cart) {
         let modifQtyBtn = document.getElementsByClassName('itemQuantity');
         Array.from(modifQtyBtn).forEach(item => {
             item.addEventListener('change', event => changeProductQuantity(item.closest('article'), cart, event.target.value));
-        }) 
+        }); 
 
         })
-        .catch(error => alert('Erreur : ' + error));         
-    }
-
-/**
- * fonction d'ajout des données utilisateur dans le localStorage
- * 
- */
- 
- async function addUserToStorage() {
-    // verif des données saisies
-    let url = new URL(window.location.href);
-    let firstName = url.searchParams.get('firstName');
-    let lastName = url.searchParams.get('lastName');
-    let address = url.searchParams.get('address');
-    let city = url.searchParams.get('city');
-    let email = url.searchParams.get('email');
-    let userData = new User(firstName, lastName, address, city, email);
-    localStorage.setItem('contact', JSON.stringify(userData));        
- }
-
- /**
-  * fonction de retour de l'utilisateur
-  */
-function getUser() {
-    let user = localStorage.getItem('contact');
-    if(!user) {
-        user = [];
-    } else {
-        user = JSON.parse(user);
-    }
-    return user;
+        .catch(error => alert('Erreur : ' + error))         
 }
-
- /**
-  * fonction d'envoi des données
-  */
-function sendCartData() {
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = () => {
-        if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-            request.open('POST', 'http://localhost:3000/api/order', false);
-            request.setRequestHeader('Content-Type', 'application/json');
-            request.send(JSON.stringify(getCart()));
-            request.send(JSON.stringify(getUser()));            
-            this.responseText.postData.text = JSON.stringify(getCart());
-            this.responseText.postData.text = JSON.stringify(getUser());
-            console.log(this.responseText.postData.text);
-        }
-    }
- }

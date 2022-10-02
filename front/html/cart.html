@@ -129,13 +129,18 @@
       </div>
       <div class="limitedWidthBlockContainer footerSecondary">
         <div class="limitedWidthBlock">
-          <p>© Copyright 2021 - 2042 | Openclassrooms by Openclassrooms | All Rights Reserved | Powered by <3</p>
+          <p>© Copyright 2021 - 2042 | Openclassrooms by Openclassrooms | All Rights Reserved | Powered by &lt;3</p>
         </div>
       </div>
     </footer>
-  <script src="../js/script.js" async></script>  
+  <script src="../js/script.js"></script>  
   <script async>
-    displayCart('cart__items', getCart());
+    document.addEventListener("DOMContentLoaded", () => {
+      let cart = getCart();
+      displayCart('cart__items', cart);  
+    });
   </script>
+  
+
   </body>
 </html>
