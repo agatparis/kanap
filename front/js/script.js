@@ -271,13 +271,15 @@ function displayCart(selector, cart) {
                 },
                 'products': productsId                         
             };
-            fetch('http://localhost:3000/api/order', {
+
+        /*    fetch('http://localhost:3000/api/products', {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json'
                 },
                 body: JSON.stringify({body})
-            });
+                })
+                .then(data => console.log(data))*/
         });
 
         // ajout des fonctions de suppression
@@ -295,3 +297,5 @@ function displayCart(selector, cart) {
         })
         .catch(error => alert('Erreur : ' + error))         
 }
+
+
