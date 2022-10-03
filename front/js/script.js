@@ -210,7 +210,7 @@ async function changeProductQuantity(element, cart, newQuantity) {
  * @param {Array} cart 
  */
 
-function displayCart(selector, cart) {
+async function displayCart(selector, cart) {
     // récupérer données JSON dans l'objet finalProduct
     let finalProduct = [];  
     let totalCartProductQuantity = 0;
@@ -271,15 +271,15 @@ function displayCart(selector, cart) {
                 },
                 'products': productsId                         
             };
-
-        /*    fetch('http://localhost:3000/api/products', {
+            fetch('http://localhost:3000/api/products/order', {
                 method: 'POST',
                 headers: {
+                    'Accept': 'application/json',
                     'Content-type': 'application/json'
                 },
-                body: JSON.stringify({body})
+                body: JSON.stringify(body)
                 })
-                .then(data => console.log(data))*/
+            .then(data => console.log(data.text()))
         });
 
         // ajout des fonctions de suppression
