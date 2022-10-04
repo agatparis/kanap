@@ -204,6 +204,7 @@ async function changeProductQuantity(element, cart, newQuantity) {
     }
 }
 
+
 /**
  * 
  * @param {String} selector 
@@ -271,15 +272,21 @@ async function displayCart(selector, cart) {
                 },
                 'products': productsId                         
             };
+
             fetch('http://localhost:3000/api/products/order', {
                 method: 'POST',
                 headers: {
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                     'Content-type': 'application/json'
                 },
-                body: JSON.stringify(body)
+                body: JSON.stringify(body),
+                Cache: 'default'
                 })
-            .then(data => console.log(data.text()))
+            .then((response) => response.json())
+            .then((order) => {
+                let url = 'confirmation.html?order=' + order.orderId;
+                location.replace(url);
+            })
         });
 
         // ajout des fonctions de suppression
@@ -299,3 +306,12 @@ async function displayCart(selector, cart) {
 }
 
 
+/**
+ * fonction d'affichage de l'id commande 
+ * 
+ */
+function displayOrderId() {
+    const parsedUrl = new URL(window.location.href);
+    const orderId = (parsedUrl.searchParams.get('order'));
+    document.getElementById('orderId').innerHTML = orderId;
+}
