@@ -261,32 +261,62 @@ async function displayCart(selector, cart) {
         document.getElementById('totalQuantity').innerHTML = totalCartProductQuantity;
         document.getElementById('totalPrice').innerHTML = totalCartPrice;        
         document.getElementById('order').closest('form').addEventListener('submit', event => {
-            event.preventDefault();            
-            let body = {
-                'contact': {
-                    'firstName': event.target.querySelector('input[name="firstName"]').value,
-                    'lastName': event.target.querySelector('input[name="lastName"]').value,
-                    'address': event.target.querySelector('input[name="address"]').value,
-                    'city': event.target.querySelector('input[name="city"]').value,
-                    'email': event.target.querySelector('input[name="email"]').value,
-                },
-                'products': productsId                         
-            };
+            event.preventDefault();
+            let validData = false;
+            let regExpAlpha = /^[ a-zA-Z\u00C0-\u00FF]*$/;
+            let regExpAlphaNum = /^[ 1-9a-zA-Z\u00C0-\u00FF]*$/;
+            let regExpEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+            if(regExpAlpha.test(event.target.querySelector('input[name="firstName"]').value) == false) {
+                alert('Vous devez saisir un prénom composé de lettres');
+                location.reload();
+            }   
+            if(regExpAlpha.test(event.target.querySelector('input[name="lastName"]').value) == false) {
+                alert('Vous devez saisir un nom composé de lettres');
+                location.reload();
+            }   
+            if(regExpAlphaNum.test(event.target.querySelector('input[name="address"]').value) == false) {
+                alert('Vous devez saisir une adresse composée de lettres et/ou de chiffres');
+                location.reload();
+            }
+            if(regExpAlpha.test(event.target.querySelector('input[name="city"]').value) == false) {
+                alert('Vous devez saisisr une ville composée de lettres');
+                location.reload();
+            }
+            if(regExpEmail.test(event.target.querySelector('input[name="email"]').value) == false) {
+                alert('Vous devez saisir une adresse mail dans un format valide');
+                location.reload();
+            }
+            else {
+                validData = true;
+            }
 
-            fetch('http://localhost:3000/api/products/order', {
-                method: 'POST',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-type': 'application/json'
-                },
-                body: JSON.stringify(body),
-                Cache: 'default'
-                })
-            .then((response) => response.json())
-            .then((order) => {
-                let url = 'confirmation.html?order=' + order.orderId;
-                location.replace(url);
-            })
+            if(validData == true) {
+                let body = {
+                    'contact': {
+                        'firstName': event.target.querySelector('input[name="firstName"]').value,
+                        'lastName': event.target.querySelector('input[name="lastName"]').value,
+                        'address': event.target.querySelector('input[name="address"]').value,
+                        'city': event.target.querySelector('input[name="city"]').value,
+                        'email': event.target.querySelector('input[name="email"]').value,
+                    },
+                    'products': productsId                         
+                };
+
+                fetch('http://localhost:3000/api/products/order', {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-type': 'application/json'
+                    },
+                    body: JSON.stringify(body),
+                    Cache: 'default'
+                    })
+                .then((response) => response.json())
+                .then((order) => {
+                    let url = 'confirmation.html?order=' + order.orderId;
+                    location.replace(url);
+                });
+            }
         });
 
         // ajout des fonctions de suppression
